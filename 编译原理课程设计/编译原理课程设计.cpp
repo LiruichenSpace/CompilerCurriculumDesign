@@ -3,10 +3,15 @@
 
 #include "pch.h"
 #include <iostream>
+#include<string>
+#include"LexAnalyzer.h"
+#include"SyntexAnalyzer.h"
 
-int main()
+int main(int argc,char* argv[])
 {
-    
+	std::string sourcePath = "test_path";
+	LexAnalyzer lexer(sourcePath);
+	lexer.getNextToken();
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
