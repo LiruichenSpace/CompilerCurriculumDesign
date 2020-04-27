@@ -14,6 +14,8 @@ private:
 	void deleteMatrix();
 	void initStream(std::string sourceFile);
 	void deleteStream();
+	int getDfaNextStatus(int currStatus);
+	bool isEndStatus(int currStatus);
 private:
 	int** matrix;//¶þÎ¬Ö¸Õë
 	char currChar;
