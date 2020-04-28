@@ -155,6 +155,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="SyntexAnalyzer.h" />
     <ClInclude Include="Token.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LexAnalyzer.cpp" />
@@ -165,6 +166,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SyntexAnalyzer.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="编译原理课程设计.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
