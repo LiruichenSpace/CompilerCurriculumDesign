@@ -57,33 +57,136 @@ Token LexAnalyzer::getNextToken() {
 	return token;
 }
 
+/**
+ * @brief 处理输入流的前导无效部分，保证currChar一定不是空白字符或者注释部分
+ *需要考虑注释和空白交替和到达尾部情况
+ */
 void LexAnalyzer::trimStreamHead() {
 
 }
 
+/**
+ * @brief 初始化状态转移矩阵
+ * 实现DFA的一部分
+ */
 void LexAnalyzer::initMatrix() {
+	int i, j;
+	for (i = 0; i < 11; i++) {
+		for (j = 0; j < 128; j++) {
+			matrix[i][j] = -1;
+		}
+	}
+	for (int i = 0; i < 10; i++) {//设定终结状态标志
+		if (i == 0 || i == 4 || i == 9)endStatusFlag[i] = false;
+		else endStatusFlag[i] = true;
+	}
+	//S一行  状态0+
+	for (j = 0; j < 128; j++) {
+		//大小写字母 [65,90]  [97,122]
+		if ((j >= 65 && j <= 90) || (j >= 97 && j <= 122)) {
+			matrix[0][j] = 6;
+		}
+		//0-9   [48,57]
+		else if ((j >= 48 && j <= 57)) {
+			if (j == 48) {
+				matrix[0][j] = 8;
+			}
+			else {
+				matrix[0][j] = 7;
+			}
+		}
+		//单字符
+		else if (j > 31) {
+			if (j == 46) {// .
+				matrix[0][j] = 2;
+			}
+			else if (j == 58) {// =
+				matrix[0][j] = 4;
+			}
+			else if (j == 39) {//'
+				matrix[0][j] = 9;
+			}
+			//除过. : =  '
+			else {
+				matrix[0][j] = 1;
+			}
+		}
+	}
+	//状态1* 全部-1
 
+	//状态2*  只修改"."
+	matrix[2][46] = 3;
+	//状态3*  全部-1
+
+	//状态4  只修改“=”
+	matrix[4][58] = 5;
+	//状态5* 全部-1
+
+	 //状态6* 只改letter和num
+	for (j = 0; j < 128; j++) {
+		if ((j >= 65 && j <= 90) || (j >= 97 && j <= 122) || (j >= 48 && j <= 57)) {
+			matrix[6][j] = 6;
+		}
+	}
+	//状态7* 只改D
+	for (j = 0; j < 128; j++) {
+		if ((j >= 48 && j <= 57)) {
+			matrix[7][j] = 7;
+		}
+	}
+	//状态9 
+	for (j = 0; j < 128; j++) {
+		if ((j >= 65 && j <= 90) || (j >= 97 && j <= 122) || (j >= 48 && j <= 57)) {
+			matrix[9][j] = 9;
+		}
+		else if (j == 39) {
+			matrix[9][j] = 10;
+		}
+	}
 }
 
+/**
+ * @brief 暂且保留，用于释放矩阵可能占据的堆区内存
+ */
 void LexAnalyzer::deleteMatrix() {
 
 }
 
+/**
+ * @brief 对输入流进行初始化，读入文件
+ * @param sourceFile 源程序文件的路径，不对文件是否可以读取进行判断
+ * 判断文件可读性需要交给外层调用来检查
+ */
 void LexAnalyzer::initStream(std::string sourceFile)
 {
 }
 
+/**
+ * @brief 关闭文件，对流进行关闭处理
+ * 有可能用来扩展功能
+ */
 void LexAnalyzer::deleteStream()
 {
 }
 
+/**
+ * @brief 根据当前字符和状态获取状态机的下一个状态
+ * @return 如果有可用状态则返回状态，否则返回-1，即不接受当前字符
+ * 当前实现仅为查表操作，如果当前状态已经为-1则仍会返回-1
+ */
 int LexAnalyzer::getDfaNextStatus(int currStatus)
 {
-
-	return 0;
+	if (currStatus != -1) {
+		return matrix[currStatus][currChar];
+	}
+	else return -1;
 }
 
+/**
+ * @brief 判断该状态是否是终止状态
+ * 通过查找标志数组实现，如果为终结状态则可以组装Token
+ */
 bool LexAnalyzer::isEndStatus(int currStatus)
 {
-	return false;
+	return endStatusFlag[currStatus];
 }

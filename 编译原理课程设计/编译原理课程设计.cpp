@@ -6,12 +6,31 @@
 #include<string>
 #include"LexAnalyzer.h"
 #include"SyntexAnalyzer.h"
+#include"Utils.h"
+
+#define DEBUG
 
 int main(int argc,char* argv[])
 {
-	std::string sourcePath = "test_path";
+	if (argc < 2)//判断参数调用方式
+	{
+		std::cout<<"程序调用参数错误，调用方式:<programename> <sourcefilename>"<<std::endl;
+		return -1;
+	}
+#ifdef DEBUG
+	Utils::log("调用正确");
+#endif // DEBUG
+	std::string sourcePath = argv[1];
+	if (Utils::checkFileReadable(sourcePath)) {//判断文件存在可读
+		std::cout << "源程序不存在或不可读，编译失败" << std::endl;
+		return -1;
+	}
+#ifdef DEBUG
+	Utils::log("文件存在可读，创建词法分析器");
+#endif // DEBUG
 	LexAnalyzer lexer(sourcePath);
 	lexer.getNextToken();
+	
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
