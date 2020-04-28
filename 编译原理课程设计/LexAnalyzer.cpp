@@ -56,9 +56,21 @@ Token LexAnalyzer::getNextToken() {
 	//理想情况下，token应该只会在文件读完的时候才会返回-1，以此为终结
 	return token;
 }
-
+/*
+*去除前导无效字符
+*/
 void LexAnalyzer::trimStreamHead() {
-
+	if (istream.is_open()) {
+		char c = istream.get();
+		while ((c == " ") || (c == "\n") || (c == "\t")) {
+			c = istream.get();
+		}
+		//设置为上一个
+		istream.seekg(-1, ios::cur);
+	}
+	else {
+		//TODO
+	}
 }
 
 void LexAnalyzer::initMatrix() {
@@ -71,10 +83,18 @@ void LexAnalyzer::deleteMatrix() {
 
 void LexAnalyzer::initStream(std::string sourceFile)
 {
+	istream = istream.open(sourceFile);
+	if (!istream.is_open()) {
+		std::cout << "文件流初始化错误！" << endl;
+		exit(1);
+	}
 }
 
 void LexAnalyzer::deleteStream()
 {
+	if ((istream != NULL) && (istream.is_open()) {
+		istream.close();
+	}
 }
 
 int LexAnalyzer::getDfaNextStatus(int currStatus)
