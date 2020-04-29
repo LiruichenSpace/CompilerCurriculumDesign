@@ -29,8 +29,15 @@ int main(int argc,char* argv[])
 	Utils::log("文件存在可读，创建词法分析器");
 #endif // DEBUG
 	LexAnalyzer lexer(sourcePath);
-	lexer.getNextToken();
-	
+	Token token;
+	do {
+		token=lexer.getNextToken();
+		if (token.type != -1)
+			std::cout << "type: " + token.type << " value: " << token.strValue << std::endl;
+		else
+			std::cout << "源文件结束，词法分析完成" << std::endl;
+	} while (token.type != -1);
+	return 0;
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单

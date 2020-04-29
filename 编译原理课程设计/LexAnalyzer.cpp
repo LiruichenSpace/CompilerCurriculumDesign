@@ -9,6 +9,7 @@ LexAnalyzer::LexAnalyzer(std::string sourceFile)
 {
 	initMatrix();
 	initStream(sourceFile);
+	currChar = istream.get();
 }
 
 
@@ -58,34 +59,35 @@ Token LexAnalyzer::getNextToken() {
 	//理想情况下，token应该只会在文件读完的时候才会返回-1，以此为终结
 	return token;
 }
-
 void LexAnalyzer::trimStreamHead() {
-	stack<char> noteStack;//临时存储注释符号
-
+	std::stack<char> noteStack;//临时存储注释符号
 	if (istream.is_open()) {
-		char c = istream.get();
-		while ((c == ' ') || (c == '\n') || (c == '\t') || (c == '{') || (c == '}') || (!noteStack.empty())) {
-			if (c == '{') {
-				noteStack.push(c);
+		while ((currChar == ' ') || 
+			(currChar == '\n') || 
+			(currChar == '\t') || 
+			(currChar == '{') || 
+			(currChar == '}') || 
+			(!noteStack.empty())) {
+			if (currChar == '{') {
+				noteStack.push(currChar);
 			}
-			if (c == '}') {
+			if (currChar == '}') {
 				if (noteStack.empty()) {
 					//TODO 出错
-					cout << "注释不匹配" << endl;
+					std::cout << "注释不匹配" << std::endl;
 					exit(0);
 				}
 				else {
 					noteStack.pop();//弹出匹配的'{'
 				}
 			}
-			c = istream.get();
+			currChar = istream.get();
 		}
 		//设置为上一个
-		istream.seekg(-1, ios::cur);
 	}
 	else {
 		//TODO
-		cout << "文件流打开失败！" << endl;
+		std::cout << "文件流打开失败！" << std::endl;
 		exit(0);
 	}
 }
