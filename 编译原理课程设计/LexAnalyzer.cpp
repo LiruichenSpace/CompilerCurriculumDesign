@@ -1,5 +1,6 @@
 #include "pch.h"
 #include<string>
+#include<stack>
 #include "LexAnalyzer.h"
 
 
@@ -58,9 +59,24 @@ Token LexAnalyzer::getNextToken() {
 }
 
 void LexAnalyzer::trimStreamHead() {
+	stack<char> noteStack;//临时存储注释符号
+
 	if (istream.is_open()) {
 		char c = istream.get();
-		while ((c == " ") || (c == "\n") || (c == "\t")) {
+		while ((c == ' ') || (c == '\n') || (c == '\t') || (c == '{') || (c == '}') || (!noteStack.empty())) {
+			if (c == '{') {
+				noteStack.push(c);
+			}
+			if (c == '}') {
+				if (noteStack.empty()) {
+					//TODO 出错
+					cout << "注释不匹配" << endl;
+					exit(0);
+				}
+				else {
+					noteStack.pop();//弹出匹配的'{'
+				}
+			}
 			c = istream.get();
 		}
 		//设置为上一个
@@ -68,6 +84,8 @@ void LexAnalyzer::trimStreamHead() {
 	}
 	else {
 		//TODO
+		cout << "文件流打开失败！" << endl;
+		exit(0);
 	}
 }
 
@@ -166,10 +184,10 @@ void LexAnalyzer::deleteMatrix() {
 void LexAnalyzer::initStream(std::string sourceFile)
 {
 	istream = istream.open(sourceFile);
-	if (!istream.is_open()) {
+	/*if (!istream.is_open()) {
 		std::cout << "文件流初始化错误！" << endl;
 		exit(1);
-	}
+	}*/
 }
 
 /**
