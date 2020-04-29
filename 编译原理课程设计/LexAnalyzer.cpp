@@ -1,15 +1,13 @@
 #include "pch.h"
-#include<iostream>
 #include<string>
 #include<stack>
 #include "LexAnalyzer.h"
-#include"Utils.h"
+
 
 LexAnalyzer::LexAnalyzer(std::string sourceFile)
 {
 	initMatrix();
 	initStream(sourceFile);
-	if (istream.is_open())currChar = istream.get();
 }
 
 
@@ -55,9 +53,7 @@ Token LexAnalyzer::getNextToken() {
 		else {
 			//为标识符，判断是否为保留字
 		}
-	}
-	else Utils::error("词法分析错误，请检查源程序");
-	//否则为初始token，type为-1，类型错误
+	}//否则为初始token，type为-1，类型错误
 	//理想情况下，token应该只会在文件读完的时候才会返回-1，以此为终结
 	return token;
 }
@@ -71,7 +67,7 @@ void LexAnalyzer::trimStreamHead() {
 			c = istream.get();
 		}
 		//设置为上一个
-		//istream.seekg(-1, ios::cur);
+		istream.seekg(-1, ios::cur);
 	}
 	else {
 		//TODO
@@ -115,7 +111,7 @@ void LexAnalyzer::initMatrix() {
 			if (j == 46) {// .
 				matrix[0][j] = 2;
 			}
-			else if (j == 58) {// ：
+			else if (j == 58) {// =
 				matrix[0][j] = 4;
 			}
 			else if (j == 39) {//'
@@ -134,7 +130,7 @@ void LexAnalyzer::initMatrix() {
 	//状态3*  全部-1
 
 	//状态4  只修改“=”
-	matrix[4][61] = 5;
+	matrix[4][58] = 5;
 	//状态5* 全部-1
 
 	 //状态6* 只改letter和num
@@ -187,7 +183,7 @@ void LexAnalyzer::initStream(std::string sourceFile)
  */
 void LexAnalyzer::deleteStream()
 {
-	if (istream.is_open()) {
+	if ((istream != NULL) && (istream.is_open()) {
 		istream.close();
 	}
 }
