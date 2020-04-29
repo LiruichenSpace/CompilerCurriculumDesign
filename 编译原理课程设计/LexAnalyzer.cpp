@@ -67,11 +67,24 @@ void LexAnalyzer::trimStreamHead() {
 
 	if (istream.is_open()) {
 		char c = istream.get();
-		while ((c == " ") || (c == "\n") || (c == "\t")) {
+		while ((c == ' ') || (c == '\n') || (c == '\t') || (c == '{') || (c == '}') || (!noteStack.empty())) {
+			if (c == '{') {
+				noteStack.push(c);
+			}
+			if (c == '}') {
+				if (noteStack.empty()) {
+					//TODO 出错
+					cout << "注释不匹配" << endl;
+					exit(0);
+				}
+				else {
+					noteStack.pop();//弹出匹配的'{'
+				}
+			}
 			c = istream.get();
 		}
 		//设置为上一个
-		//istream.seekg(-1, ios::cur);
+		istream.seekg(-1, ios::cur);
 	}
 	else {
 		//TODO
