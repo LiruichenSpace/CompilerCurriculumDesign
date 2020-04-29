@@ -27,3 +27,9 @@ void Utils::log(std::string message, std::string Tag)
 {
 	std::cout << "log: " << Tag << ":" << message << std::endl;
 }
+
+void Utils::error(std::string message)
+{
+	std::cout << "error: " + message << std::endl;
+	exit(-1);
+}
