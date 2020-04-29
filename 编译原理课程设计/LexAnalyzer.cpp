@@ -1,4 +1,5 @@
 #include "pch.h"
+#include<iostream>
 #include<string>
 #include<stack>
 #include "LexAnalyzer.h"
@@ -170,11 +171,11 @@ void LexAnalyzer::deleteMatrix() {
  */
 void LexAnalyzer::initStream(std::string sourceFile)
 {
-	istream = istream.open(sourceFile);
+	istream.open(sourceFile);
 	if (!istream.is_open()) {
-		std::cout << "文件流初始化错误！" << endl;
+		std::cout << "文件流初始化错误！" << std::endl;
 		exit(1);
-	}*/
+	}
 }
 
 /**
@@ -183,7 +184,7 @@ void LexAnalyzer::initStream(std::string sourceFile)
  */
 void LexAnalyzer::deleteStream()
 {
-	if ((istream != NULL) && (istream.is_open()) {
+	if (istream.is_open()) {
 		istream.close();
 	}
 }
