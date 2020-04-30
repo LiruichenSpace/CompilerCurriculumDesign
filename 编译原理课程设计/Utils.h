@@ -10,5 +10,6 @@ public:
 	~Utils();
 	static bool checkFileReadable(std::string sourceFile);
 	static void log(std::string message, std::string Tag="test");
+	static void error(std::string message);
 };
 

@@ -31,11 +31,11 @@ int main(int argc,char* argv[])
 	LexAnalyzer lexer(sourcePath);
 	Token token;
 	do {
-		token=lexer.getNextToken();
+		token = lexer.getNextToken();
 		if (token.type != -1)
-			std::cout << "type: " + token.type << " value: " << token.strValue << std::endl;
+			std::cout << "type: " << token.type << " value: " << token.strValue << std::endl;
 		else
-			std::cout << "源文件结束，词法分析完成" << std::endl;
+			std::cout << "文件读取完毕，词法分析结束" << std::endl;
 	} while (token.type != -1);
 	return 0;
 }

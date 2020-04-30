@@ -1,7 +1,7 @@
 #include "pch.h"
 #include<iostream>
 #include<string>
-#include<stack>
+#include"Utils.h"
 #include "LexAnalyzer.h"
 
 
@@ -10,6 +10,44 @@ LexAnalyzer::LexAnalyzer(std::string sourceFile)
 	initMatrix();
 	initStream(sourceFile);
 	currChar = istream.get();
+	cricicalMap["INTEGER"] = 1;
+	cricicalMap["RETURN"] = 2;
+	cricicalMap["BEGIN"] = 3;
+	cricicalMap["VAR"] = 4;
+	cricicalMap["OF"] = 5;
+	cricicalMap["WRITE"] = 6;
+	cricicalMap["ELSE"] = 7;
+	cricicalMap["ENDWH"] = 8;
+	cricicalMap["ID"] = 9;
+	cricicalMap["ARRAY"] = 10;
+	cricicalMap["CHAR"] = 11;
+	cricicalMap["INTC"] = 12;
+	cricicalMap["DO"] = 13;
+	cricicalMap["PROCEDURE"] = 14;
+	cricicalMap["RECORD"] = 15;
+	cricicalMap["END"] = 16;
+	cricicalMap["TYPE"] = 17;
+	cricicalMap["READ"] = 18;
+	cricicalMap["PROGRAM"] = 19;
+	cricicalMap["IF"] = 20;
+	cricicalMap["FI"] = 21;
+	cricicalMap["WHILE"] = 22;
+	cricicalMap["THEN"] = 23;
+	cricicalMap["="] = 24;
+	cricicalMap[";"] = 25;
+	cricicalMap["<"] = 26;
+	cricicalMap["]"] = 27;
+	cricicalMap["*"] = 28;
+	cricicalMap[".."] = 29;
+	cricicalMap["."] = 30;
+	cricicalMap["-"] = 31;
+	cricicalMap["("] = 32;
+	cricicalMap[","] = 33;
+	cricicalMap[")"] = 34;
+	cricicalMap["+"] = 35;
+	cricicalMap[":="] = 36;
+	cricicalMap["/"] = 37;
+	cricicalMap["["] = 38;
 }
 
 
@@ -48,48 +86,46 @@ Token LexAnalyzer::getNextToken() {
 		}	
 	}
 	if (isEndStatus(currStatus)) {//如果当前状态为终止状态，则填入token值并正常返回
-		token.strValue = str;
-		if (currStatus != 4) {//判断如果不是标识符则直接填写类型
-			token.type = currStatus;
+		if (currStatus == 6) {
+			if (cricicalMap.find(str) != cricicalMap.end()) {
+				token.type = cricicalMap[str];
+			}
+			else {
+				token.type = 9;
+			}
+		}
+		else if (currStatus == 7 || currStatus == 8) {
+			token.type = 12;
 		}
 		else {
-			//为标识符，判断是否为保留字
+			token.type = cricicalMap[str];
 		}
+		token.strValue = str;
 	}//否则为初始token，type为-1，类型错误
 	//理想情况下，token应该只会在文件读完的时候才会返回-1，以此为终结
 	return token;
 }
 void LexAnalyzer::trimStreamHead() {
-	std::stack<char> noteStack;//临时存储注释符号
 	if (istream.is_open()) {
-		while ((currChar == ' ') || 
-			(currChar == '\n') || 
-			(currChar == '\t') || 
-			(currChar == '{') || 
-			(currChar == '}') || 
-			(!noteStack.empty())) {
+		while ((currChar == ' ') || (currChar == '\n') || (currChar == '\t') || (currChar == '{') || (currChar == '}')) {
 			if (currChar == '{') {
-				noteStack.push(currChar);
+				while ((currChar != '}') && (currChar != EOF)) {
+					currChar = istream.get();
+				}
+				if (currChar == EOF) {
+					Utils::error("注释不匹配!");
+				}
 			}
-			if (currChar == '}') {
-				if (noteStack.empty()) {
-					//TODO 出错
-					std::cout << "注释不匹配" << std::endl;
-					exit(0);
-				}
-				else {
-					noteStack.pop();//弹出匹配的'{'
-				}
+			else if (currChar == '}'){
+				Utils::error("注释不匹配！");
 			}
 			currChar = istream.get();
 		}
-		//设置为上一个
 	}
 	else {
-		//TODO
-		std::cout << "文件流打开失败！" << std::endl;
-		exit(0);
+		Utils::error("文件流打开失败！");
 	}
+
 }
 
 /**
@@ -127,7 +163,7 @@ void LexAnalyzer::initMatrix() {
 			if (j == 46) {// .
 				matrix[0][j] = 2;
 			}
-			else if (j == 58) {// =
+			else if (j == 58) {//:
 				matrix[0][j] = 4;
 			}
 			else if (j == 39) {//'
@@ -146,7 +182,7 @@ void LexAnalyzer::initMatrix() {
 	//状态3*  全部-1
 
 	//状态4  只修改“=”
-	matrix[4][58] = 5;
+	matrix[4][61] = 5;
 	//状态5* 全部-1
 
 	 //状态6* 只改letter和num
