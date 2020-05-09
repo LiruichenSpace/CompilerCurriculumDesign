@@ -28,15 +28,12 @@ int main(int argc,char* argv[])
 #ifdef DEBUG
 	Utils::log("文件存在可读，创建词法分析器");
 #endif // DEBUG
-	LexAnalyzer lexer(sourcePath);
-	Token token;
-	do {
-		token = lexer.getNextToken();
-		if (token.type != -1)
-			std::cout << "type: " << token.type << " value: " << token.strValue << std::endl;
-		else
-			std::cout << "文件读取完毕，词法分析结束" << std::endl;
-	} while (token.type != -1);
+	//std::string matrix_path = "D:/编译原理预处理/Matrix.txt";
+	//std::string table_path = "D:/编译原理预处理/exp_out.txt";
+	std::string matrix_path = "./Matrix.txt";
+	std::string table_path = "./exp_out.txt";
+	SyntexAnalyzer analyzer(sourcePath,matrix_path,table_path);
+	std::cout << analyzer.analyze() << std::endl;
 	return 0;
 }
 

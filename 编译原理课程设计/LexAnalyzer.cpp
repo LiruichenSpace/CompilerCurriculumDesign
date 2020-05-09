@@ -10,44 +10,44 @@ LexAnalyzer::LexAnalyzer(std::string sourceFile)
 	initMatrix();
 	initStream(sourceFile);
 	currChar = istream.get();
-	cricicalMap["INTEGER"] = 1;
-	cricicalMap["RETURN"] = 2;
-	cricicalMap["BEGIN"] = 3;
-	cricicalMap["VAR"] = 4;
-	cricicalMap["OF"] = 5;
-	cricicalMap["WRITE"] = 6;
-	cricicalMap["ELSE"] = 7;
-	cricicalMap["ENDWH"] = 8;
-	cricicalMap["ID"] = 9;
-	cricicalMap["ARRAY"] = 10;
-	cricicalMap["CHAR"] = 11;
-	cricicalMap["INTC"] = 12;
-	cricicalMap["DO"] = 13;
-	cricicalMap["PROCEDURE"] = 14;
-	cricicalMap["RECORD"] = 15;
-	cricicalMap["END"] = 16;
-	cricicalMap["TYPE"] = 17;
-	cricicalMap["READ"] = 18;
-	cricicalMap["PROGRAM"] = 19;
-	cricicalMap["IF"] = 20;
-	cricicalMap["FI"] = 21;
-	cricicalMap["WHILE"] = 22;
-	cricicalMap["THEN"] = 23;
-	cricicalMap["="] = 24;
-	cricicalMap[";"] = 25;
-	cricicalMap["<"] = 26;
-	cricicalMap["]"] = 27;
-	cricicalMap["*"] = 28;
-	cricicalMap[".."] = 29;
-	cricicalMap["."] = 30;
-	cricicalMap["-"] = 31;
-	cricicalMap["("] = 32;
-	cricicalMap[","] = 33;
-	cricicalMap[")"] = 34;
-	cricicalMap["+"] = 35;
-	cricicalMap[":="] = 36;
-	cricicalMap["/"] = 37;
-	cricicalMap["["] = 38;
+	cricicalMap["INTEGER"] = 0;
+	cricicalMap["RETURN"] = 1;
+	cricicalMap["BEGIN"] = 2;
+	cricicalMap["VAR"] = 3;
+	cricicalMap["OF"] = 4;
+	cricicalMap["WRITE"] = 5;
+	cricicalMap["ELSE"] = 6;
+	cricicalMap["ENDWH"] = 7;
+	cricicalMap["ID"] = 8;
+	cricicalMap["ARRAY"] = 9;
+	cricicalMap["CHAR"] = 10;
+	cricicalMap["INTC"] = 11;
+	cricicalMap["DO"] = 12;
+	cricicalMap["PROCEDURE"] = 13;
+	cricicalMap["RECORD"] = 14;
+	cricicalMap["END"] = 15;
+	cricicalMap["TYPE"] = 16;
+	cricicalMap["READ"] = 17;
+	cricicalMap["PROGRAM"] = 18;
+	cricicalMap["IF"] = 19;
+	cricicalMap["FI"] = 20;
+	cricicalMap["WHILE"] = 21;
+	cricicalMap["THEN"] = 22;
+	cricicalMap["="] = 23;
+	cricicalMap[";"] = 24;
+	cricicalMap["<"] = 25;
+	cricicalMap["]"] = 26;
+	cricicalMap["*"] = 27;
+	cricicalMap[".."] = 28;
+	cricicalMap["."] = 29;
+	cricicalMap["-"] = 30;
+	cricicalMap["("] = 31;
+	cricicalMap[","] = 32;
+	cricicalMap[")"] = 33;
+	cricicalMap["+"] = 34;
+	cricicalMap[":="] = 35;
+	cricicalMap["/"] = 36;
+	cricicalMap["["] = 37;
 }
 
 
@@ -74,7 +74,8 @@ Token LexAnalyzer::getNextToken() {
 	while (flag) {
 		nextStatus = getDfaNextStatus(currStatus);//需要已经读入一个字符
 		if (nextStatus == -1) {//如果接下来没有转移去的状态，则结束。不继续向下读，保护currChar
-			flag = false;
+			if (currStatus == 0)Utils::error("检测到非法字符，词法分析失败");
+			else flag = false;
 		}
 		else {//若被接受则去读下一个字符
 			str.push_back(currChar);//当前字符可被接受，继续进行
@@ -91,11 +92,11 @@ Token LexAnalyzer::getNextToken() {
 				token.type = cricicalMap[str];
 			}
 			else {
-				token.type = 9;
+				token.type = 8;
 			}
 		}
 		else if (currStatus == 7 || currStatus == 8) {
-			token.type = 12;
+			token.type = 11;
 		}
 		else {
 			token.type = cricicalMap[str];
