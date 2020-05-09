@@ -25,11 +25,11 @@ bool Utils::checkFileReadable(std::string sourceFile)
 
 void Utils::log(std::string message, std::string Tag)
 {
-	std::cout << "log: " << Tag << ":" << message << std::endl;
+	std::cout << std::endl << "log: " << Tag << ":" << message << std::endl;
 }
 
 void Utils::error(std::string message)
 {
-	std::cout << "error: " + message << std::endl;
+	std::cout << std::endl << "error: " + message << std::endl;
 	exit(-1);
 }

@@ -5,10 +5,9 @@
 #include "LexAnalyzer.h"
 
 
-LexAnalyzer::LexAnalyzer(std::string sourceFile)
+LexAnalyzer::LexAnalyzer()
 {
 	initMatrix();
-	initStream(sourceFile);
 	currChar = istream.get();
 	cricicalMap["INTEGER"] = 0;
 	cricicalMap["RETURN"] = 1;
@@ -50,6 +49,12 @@ LexAnalyzer::LexAnalyzer(std::string sourceFile)
 	cricicalMap["["] = 37;
 }
 
+LexAnalyzer::LexAnalyzer(std::string sourceFile)
+{
+	LexAnalyzer();
+	initStream(sourceFile);
+}
+
 
 LexAnalyzer::~LexAnalyzer()
 {
@@ -72,10 +77,10 @@ Token LexAnalyzer::getNextToken() {
 	std::string str;
 	bool flag=true;
 	while (flag) {
+		if (!isValidChar())Utils::error("\n检测到非法字符，词法分析失败");
 		nextStatus = getDfaNextStatus(currStatus);//需要已经读入一个字符
 		if (nextStatus == -1) {//如果接下来没有转移去的状态，则结束。不继续向下读，保护currChar
-			if (currStatus == 0)Utils::error("检测到非法字符，词法分析失败");
-			else flag = false;
+			flag = false;
 		}
 		else {//若被接受则去读下一个字符
 			str.push_back(currChar);//当前字符可被接受，继续进行
@@ -84,11 +89,11 @@ Token LexAnalyzer::getNextToken() {
 			if (currChar == EOF) {//文件结束,取消下一轮循环,此时应相当于Token加入了“#”，可以考虑直接返回特殊标志
 				flag = false;
 			}//由于EOF不会带来转移，到达EOF后重复调用也会获得无效Token
-		}	
+		}
 	}
 	if (isEndStatus(currStatus)) {//如果当前状态为终止状态，则填入token值并正常返回
 		if (currStatus == 6) {
-			if (cricicalMap.find(str) != cricicalMap.end()) {
+			if (cricicalMap.find(str) != cricicalMap.end()){
 				token.type = cricicalMap[str];
 			}
 			else {
@@ -106,8 +111,13 @@ Token LexAnalyzer::getNextToken() {
 	//理想情况下，token应该只会在文件读完的时候才会返回-1，以此为终结
 	return token;
 }
-void LexAnalyzer::trimStreamHead() {
-	if (istream.is_open()) {
+bool LexAnalyzer::streamValiable()
+{
+	if (istream.is_open())return true;
+	else return false;
+}
+void LexAnalyzer::trimStreamHead(){
+	if (istream.is_open()){
 		while ((currChar == ' ') || (currChar == '\n') || (currChar == '\t') || (currChar == '{') || (currChar == '}')) {
 			if (currChar == '{') {
 				while ((currChar != '}') && (currChar != EOF)) {
@@ -262,3 +272,30 @@ bool LexAnalyzer::isEndStatus(int currStatus)
 {
 	return endStatusFlag[currStatus];
 }
+
+bool LexAnalyzer::isValidChar()
+{
+	if ((currChar >= 'a'&&currChar <= 'z') || (currChar >= 'A'&&currChar <= 'Z')
+		|| (currChar >= '0'&&currChar <= '9')
+		|| currChar == '<'
+		|| currChar == '='
+		|| currChar == '+'
+		|| currChar == '-'
+		|| currChar == '*'
+		|| currChar == '/'
+		|| currChar == ':'
+		|| currChar == '.'
+		|| currChar == ';'
+		|| currChar == '['
+		|| currChar == ']'
+		|| currChar == '{'
+		|| currChar == '}'
+		|| currChar == '('
+		|| currChar == ')'
+		|| currChar == EOF
+		|| currChar == ' '
+		|| currChar == '\n'
+		|| currChar == '\t')return true;
+	else return false;
+}
+

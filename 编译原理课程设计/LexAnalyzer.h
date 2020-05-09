@@ -2,6 +2,7 @@
 #include <fstream>
 #include<string>
 #include<unordered_map>
+#include<unordered_set>
 #include "Token.h"
 /**
  * @brief 词法分析器类
@@ -12,25 +13,29 @@
 class LexAnalyzer
 {
 public:
+	LexAnalyzer();
 	LexAnalyzer(std::string sourceFile);
 	virtual ~LexAnalyzer();
 	Token getNextToken();
+	bool streamValiable();
+	//初始化流对象
+	void initStream(std::string sourceFile);
 private:
 	//去除下一单词前无效字符
 	void trimStreamHead();
 	void initMatrix();
 	void deleteMatrix();
-	//初始化流对象
-	void initStream(std::string sourceFile);
 	//删除流对象
 	void deleteStream();
 	int getDfaNextStatus(int currStatus);
 	bool isEndStatus(int currStatus);
+	bool isValidChar();
 private:
 	int matrix[11][128];//状态转移矩阵
 	bool endStatusFlag[11];
 	char currChar;
 	std::unordered_map<std::string, int> cricicalMap;
+	std::unordered_set<char> validChars;
 	std::ifstream istream;
 };
 /*

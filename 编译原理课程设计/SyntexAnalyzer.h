@@ -10,16 +10,15 @@
 class SyntexAnalyzer
 {
 public:
-	SyntexAnalyzer(std::string sourcePath, std::string matrixPath, std::string tablePath);
+	SyntexAnalyzer();
 	virtual ~SyntexAnalyzer();
-	bool analyze();
-private:
-	void initMatrix(std::string matrixPath);
-	void initTable(std::string tablePath);
-private:
-	int matrix[67][38];
-	std::vector<std::vector<int>> table;
-	LexAnalyzer lexanalyzer;
-	std::vector<int> characterStack;
+	void analyExpression();//LL(1)
+	void initAllTab();
+	void showTab(std::vector<std::vector<int>>& A);
+public:
+	std::vector<std::vector<int>> tableLL;
+	std::vector<std::vector<int>> tablePro;
+	std::vector<int> analyStack;   
+	std::vector<int> exprStack;
 };
 
