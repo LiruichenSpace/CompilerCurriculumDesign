@@ -3,6 +3,7 @@
 #include<iostream>
 #include <iomanip>
 #include<stack>
+#include"Utils.h"
 #include "SyntexAnalyzer.h"
 
 #define  VT  5 //常数 数值为非终极符数目
@@ -14,93 +15,42 @@ SyntexAnalyzer::~SyntexAnalyzer()
 {
 }
 
-void  SyntexAnalyzer::initAllTab() {//手动输入  仅为测试用 tableLL和tablePro后续替换成从文件读取出的vector  此函数可弃
-	std::vector<int> B;
-	//----存分析表
-	B.push_back(0);
-	B.push_back(-1);
-	B.push_back(-1);
-	B.push_back(0);
-	B.push_back(-1);
-	B.push_back(-1);
-	tableLL.push_back(B);
-	B.clear();
+/*
+*由filename指定的文件初始化vector
+*/
+void SyntexAnalyzer::initVector(std::vector<std::vector<int>>& v1, std::string filename) {
+	ifstream v_istream;
+	v_istream.open(filename);
+	if (!v_istream.is_open()) {
+		Utils::error("初始化vector文件流打开失败");
+	}
+	int curInt = -1;
+	char curC = '0';
+	std::vector<int> v;
+	v = *(new std::vector<int>());
+	while ((!v_istream.eof()) && (curC != EOF))
+	{
+		if (curC == '\n') {
+			v1.push_back(v);
+			v = *(new std::vector<int>());
+			//cout << "新一行" << endl;
 
-	B.push_back(-1);
-	B.push_back(1);
-	B.push_back(-1);
-	B.push_back(-1);
-	B.push_back(2);
-	B.push_back(2);
-	tableLL.push_back(B);
-	B.clear();
-
-	B.push_back(3);
-	B.push_back(-1);
-	B.push_back(-1);
-	B.push_back(3);
-	B.push_back(-1);
-	B.push_back(-1);
-	tableLL.push_back(B);
-	B.clear();
-
-	B.push_back(-1);
-	B.push_back(5);
-	B.push_back(4);
-	B.push_back(-1);
-	B.push_back(5);
-	B.push_back(5);
-	tableLL.push_back(B);
-	B.clear();
-
-	B.push_back(6);
-	B.push_back(-1);
-	B.push_back(-1);
-	B.push_back(7);
-	B.push_back(-1);
-	B.push_back(-1);
-	tableLL.push_back(B);
-	B.clear();
-	//--------存产生式
-	B.push_back(2);
-	B.push_back(1);
-	tablePro.push_back(B);
-	B.clear();
-
-	B.push_back(6);
-	B.push_back(2);
-	B.push_back(1);
-	tablePro.push_back(B);
-	B.clear();
-
-	B.push_back(10);
-	tablePro.push_back(B);
-	B.clear();
-
-	B.push_back(4);
-	B.push_back(3);
-	tablePro.push_back(B);
-	B.clear();
-
-	B.push_back(7);
-	B.push_back(4);
-	B.push_back(3);
-	tablePro.push_back(B);
-	B.clear();
-
-	B.push_back(10);
-	tablePro.push_back(B);
-	B.clear();
-
-	B.push_back(5);
-	tablePro.push_back(B);
-	B.clear();
-
-	B.push_back(8);
-	B.push_back(0);
-	B.push_back(9);
-	tablePro.push_back(B);
-	B.clear();
+		}
+		v_istream >> curInt;
+		v.push_back(curInt);//压入
+		//cout << curInt << endl;
+		curC = v_istream.get();
+		v_istream.seekg(-1, ios::cur);
+	}
+	v1.push_back(v);
+}
+void  SyntexAnalyzer::initAllTab() {
+	std::string exp_filename = "./exp_out.txt";
+	std::string matrix_filename = "./Matrix.txt";
+	//初始化exp_out
+	initVector(tablePro, exp_filename);
+	//初始化分析表
+	initVector(tableLL, matrix_filename);
 }
 
 
