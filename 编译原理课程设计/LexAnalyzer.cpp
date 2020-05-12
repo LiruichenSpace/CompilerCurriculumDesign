@@ -76,7 +76,11 @@ Token LexAnalyzer::getNextToken() {
 	std::string str;
 	bool flag=true;
 	while (flag) {
-		if (!isValidChar())Utils::error("检测到非法字符，词法分析失败");
+		if (!isValidChar()){
+			std::string errstr("检测到非法字符，词法分析失败,当前字符为:");
+			errstr.push_back(currChar);
+			Utils::error(errstr);
+		}
 		nextStatus = getDfaNextStatus(currStatus);//需要已经读入一个字符
 		if (nextStatus == -1) {//如果接下来没有转移去的状态，则结束。不继续向下读，保护currChar
 			flag = false;

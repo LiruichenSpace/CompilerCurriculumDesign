@@ -6,9 +6,11 @@
 #include"Utils.h"
 #include "SyntexAnalyzer.h"
 
-#define  VT  5 //常数 数值为非终极符数目
-SyntexAnalyzer::SyntexAnalyzer()
+#define  VT  38 //常数 数值为非终极符数目
+SyntexAnalyzer::SyntexAnalyzer(LexAnalyzer* L)
 {
+	lexA = L;
+	initAllTab();
 }
 
 SyntexAnalyzer::~SyntexAnalyzer()
@@ -78,7 +80,7 @@ void SyntexAnalyzer::analyExpression() {
 		作为测试 此处使用int数组代替token       #使用数字10代替 修改待商议
 	*/
 	//int数组声明 仅测试用 后可删除 
-	int test[6] = { 5, 6,5, 7, 5,10 };
+	int test[6] = { 18, 8,16, 8, 23 };
 	//int数组声明 仅测试用 后可删除 end
 
 	//临时变量声明
@@ -88,11 +90,14 @@ void SyntexAnalyzer::analyExpression() {
 	//临时变量声明 end
 
 	//初始化分析栈以及输入栈
-	analyStack.push_back(10); //#入栈
-	analyStack.push_back(0);//0号产生式入栈
+
+	analyStack.push_back(38);//0号非终极符入栈
 	//循环读取输入流   应该使用getNextToken()获取输入流  同上做修改 手动输入56575
-	for (i = 0; i < 6; i++) {
-		exprStack.push_back(test[i]);
+	Token t = lexA->getNextToken();
+	while (t.type != -1) {
+		std::cout << t.strValue << "  " << t.type << std::endl;
+		exprStack.push_back(t.type);
+		t = lexA->getNextToken();
 	}
 	//初始化分析栈以及输入栈 end
 
@@ -111,8 +116,8 @@ void SyntexAnalyzer::analyExpression() {
 	//开始分成四种情况分析  
 	//当分析栈空的时候停止
 	while (1) {
-		if (analyStack.size() == 1) {
-			if (exprStack.size() == 1) {//情况1：若栈已空，输入流也空，则语法分析成功
+		if (analyStack.size() == 0) {
+			if (exprStack.size() == 0) {//情况1：若栈已空，输入流也空，则语法分析成功
 				std::cout << "语法分析成功" << std::endl;
 			}
 			else {//情况2：若栈已空，输入流不空，则输入流报错
@@ -124,10 +129,10 @@ void SyntexAnalyzer::analyExpression() {
 		//情况3：
 		//分析栈栈顶元素是非终极符 即为小于某常数VT VT为非终极符个数 此处为5
 		//用栈顶和输入流的当前单词去查当前矩阵，如果查得的值是产生式编号，则把对应的产生式右部逆序压入栈中；如果查得的值为错误 信息，则报错
-		if (analyStack.back() < VT) {//当前栈顶是非终极符 查表
-			if (tableLL[analyStack.back()][exprStack.front() - VT] != -1) {//查表得到产生式编号  注意终极符编号减去VT
-				tabLLX = analyStack.back();
-				tabLLY = exprStack.front() - VT;
+		if (analyStack.back() >= VT) {//当前栈顶是非终极符 查表
+			if (tableLL[analyStack.back() - VT][exprStack.front()] != -1) {//查表得到产生式编号  注意终极符编号减去VT
+				tabLLX = analyStack.back() - VT;
+				tabLLY = exprStack.front();
 				proExp = tableLL[tabLLX][tabLLY];
 				std::cout << "X" << tabLLX << "Y" << tabLLY << std::endl;
 				std::cout << "产生式序号" << proExp << std::endl;
@@ -138,13 +143,13 @@ void SyntexAnalyzer::analyExpression() {
 				}
 				std::cout << std::endl;
 				//将产生式右部逆序压入分析栈
-				if (tablePro[proExp][0] == 10) {
-					std::cout << "产生式第一个值为10（即为#）打印分析栈弹栈" << std::endl;
+				if (tablePro[proExp][0] == -1) {
+					std::cout << "产生式推出空 打印分析栈弹栈" << std::endl;
 
 					analyStack.pop_back();
 				}
 				else {
-					std::cout << "产生式第一个值不是10（#）  正常处理" << std::endl;
+					std::cout << "产生式非空   正常处理" << std::endl;
 					analyStack.pop_back();//弹栈
 					for (i = tablePro[proExp].size() - 1; i >= 0; i--) {
 						analyStack.push_back(tablePro[proExp][i]);//逆序压入
@@ -156,7 +161,7 @@ void SyntexAnalyzer::analyExpression() {
 			}
 		}
 		//情况4：
-		else if (analyStack.back() >= VT) {//当前栈顶是当前栈顶是终极符 看其是否与输入流的头符相匹配，如果匹配 成功，去掉栈顶元素,并读下一个单词；若匹配不成功，则报错
+		else if (analyStack.back() < VT) {//当前栈顶是当前栈顶是终极符 看其是否与输入流的头符相匹配，如果匹配 成功，去掉栈顶元素,并读下一个单词；若匹配不成功，则报错
 			if (analyStack.back() == exprStack.front()) {  //两者都是非终极符 看是否匹配
 				//成功 各自弹栈一个
 				analyStack.pop_back();

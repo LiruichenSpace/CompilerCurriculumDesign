@@ -10,7 +10,7 @@
 class SyntexAnalyzer
 {
 public:
-	SyntexAnalyzer();
+	SyntexAnalyzer(LexAnalyzer* L);
 	virtual ~SyntexAnalyzer();
 	void analyExpression();//LL(1)
 	void initAllTab();
@@ -22,5 +22,6 @@ public:
 	std::vector<std::vector<int>> tablePro;
 	std::vector<int> analyStack;   
 	std::vector<int> exprStack;
+	LexAnalyzer *lexA;
 };
 
