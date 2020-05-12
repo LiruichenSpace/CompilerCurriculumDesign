@@ -27,12 +27,13 @@ void SyntexAnalyzer::initVector(std::vector<std::vector<int>>& v1, std::string f
 	int curInt = -1;
 	char curC = '0';
 	std::vector<int> v;
-	v = *(new std::vector<int>());
+	//v = *(new std::vector<int>());
 	while ((!v_istream.eof()) && (curC != EOF))
 	{
 		if (curC == '\n') {
 			v1.push_back(v);
-			v = *(new std::vector<int>());
+			v.clear();
+			//v = *(new std::vector<int>());
 			//cout << "ÐÂÒ»ÐÐ" << endl;
 
 		}
