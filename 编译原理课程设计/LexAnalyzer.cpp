@@ -8,7 +8,6 @@
 LexAnalyzer::LexAnalyzer()
 {
 	initMatrix();
-	currChar = istream.get();
 	cricicalMap["INTEGER"] = 0;
 	cricicalMap["RETURN"] = 1;
 	cricicalMap["BEGIN"] = 2;
@@ -49,9 +48,9 @@ LexAnalyzer::LexAnalyzer()
 	cricicalMap["["] = 37;
 }
 
-LexAnalyzer::LexAnalyzer(std::string sourceFile)
+LexAnalyzer::LexAnalyzer(std::string sourceFile):LexAnalyzer()//机制原因，C++不能在构造函数中调用构造函数
+															//需要在初始化列表中调用
 {
-	LexAnalyzer();
 	initStream(sourceFile);
 }
 
@@ -77,7 +76,7 @@ Token LexAnalyzer::getNextToken() {
 	std::string str;
 	bool flag=true;
 	while (flag) {
-		if (!isValidChar())Utils::error("\n检测到非法字符，词法分析失败");
+		if (!isValidChar())Utils::error("检测到非法字符，词法分析失败");
 		nextStatus = getDfaNextStatus(currStatus);//需要已经读入一个字符
 		if (nextStatus == -1) {//如果接下来没有转移去的状态，则结束。不继续向下读，保护currChar
 			flag = false;
@@ -136,7 +135,6 @@ void LexAnalyzer::trimStreamHead(){
 	else {
 		Utils::error("文件流打开失败！");
 	}
-
 }
 
 /**
@@ -238,6 +236,7 @@ void LexAnalyzer::initStream(std::string sourceFile)
 		std::cout << "文件流初始化错误！" << std::endl;
 		exit(1);
 	}
+	currChar = istream.get();
 }
 
 /**

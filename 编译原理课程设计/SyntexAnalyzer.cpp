@@ -19,7 +19,7 @@ SyntexAnalyzer::~SyntexAnalyzer()
 *由filename指定的文件初始化vector
 */
 void SyntexAnalyzer::initVector(std::vector<std::vector<int>>& v1, std::string filename) {
-	ifstream v_istream;
+	std::ifstream v_istream;
 	v_istream.open(filename);
 	if (!v_istream.is_open()) {
 		Utils::error("初始化vector文件流打开失败");
@@ -34,13 +34,12 @@ void SyntexAnalyzer::initVector(std::vector<std::vector<int>>& v1, std::string f
 			v1.push_back(v);
 			v = *(new std::vector<int>());
 			//cout << "新一行" << endl;
-
 		}
 		v_istream >> curInt;
 		v.push_back(curInt);//压入
 		//cout << curInt << endl;
 		curC = v_istream.get();
-		v_istream.seekg(-1, ios::cur);
+		v_istream.seekg(-1, std::ios::cur);
 	}
 	v1.push_back(v);
 }

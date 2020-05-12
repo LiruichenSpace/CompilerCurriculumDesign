@@ -25,6 +25,7 @@ int main(int argc,char* argv[])
 		std::cout << "源程序不存在或不可读，编译失败" << std::endl;
 		return -1;
 	}
+	
 #ifdef DEBUG
 	Utils::log("文件存在可读，创建词法分析器");
 #endif // DEBUG
