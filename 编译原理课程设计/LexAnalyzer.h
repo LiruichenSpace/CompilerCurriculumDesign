@@ -30,6 +30,7 @@ private:
 	int getDfaNextStatus(int currStatus);
 	bool isEndStatus(int currStatus);
 	bool isValidChar();
+	void updateCurrentLine();//更新当前行号
 private:
 	int matrix[11][128];//状态转移矩阵
 	bool endStatusFlag[11];
@@ -37,6 +38,7 @@ private:
 	std::unordered_map<std::string, int> cricicalMap;
 	std::unordered_set<char> validChars;
 	std::ifstream istream;
+	int currentLine;//当前行号
 };
 /*
 Token类型与其type对照表：

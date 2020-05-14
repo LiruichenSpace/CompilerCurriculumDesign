@@ -119,9 +119,15 @@ bool LexAnalyzer::streamValiable()
 	if (istream.is_open())return true;
 	else return false;
 }
+void LexAnalyzer::updateCurrentLine() {
+	currentLine++;
+}
 void LexAnalyzer::trimStreamHead(){
 	if (istream.is_open()){
 		while ((currChar == ' ') || (currChar == '\n') || (currChar == '\t') || (currChar == '{') || (currChar == '}')) {
+			if (currChar == '\n') {
+				updateCurrentLine();
+			}
 			if (currChar == '{') {
 				while ((currChar != '}') && (currChar != EOF)) {
 					currChar = istream.get();
@@ -241,6 +247,7 @@ void LexAnalyzer::initStream(std::string sourceFile)
 		exit(1);
 	}
 	currChar = istream.get();
+	currentLine = 1;//初始化当前行号
 }
 
 /**
