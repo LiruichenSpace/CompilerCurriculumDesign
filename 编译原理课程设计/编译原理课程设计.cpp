@@ -32,9 +32,8 @@ int main(int argc,char* argv[])
 #endif // DEBUG
 	LexAnalyzer lexA(sourcePath);
 	SyntexAnalyzer synA(&lexA);
-
 	synA.analyExpression();
-
+	synA.printAST();
 	return 0;
 }
 

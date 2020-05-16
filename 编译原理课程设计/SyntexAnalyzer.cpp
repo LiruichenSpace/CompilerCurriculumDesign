@@ -11,6 +11,7 @@ SyntexAnalyzer::SyntexAnalyzer(LexAnalyzer* L)
 {
 	lexA = L;
 	initAllTab();
+	root = nullptr;
 }
 
 SyntexAnalyzer::~SyntexAnalyzer()
@@ -46,6 +47,17 @@ void SyntexAnalyzer::initVector(std::vector<std::vector<int>>& v1, std::string f
 	}
 	v1.push_back(v);
 }
+void SyntexAnalyzer::deleteTree(TreeNode * root)
+{
+	if (root == nullptr)return;
+	else {
+		for (TreeNode* child: root->children) {
+			deleteTree(child);
+		}
+		delete root;
+		root = nullptr;
+	}
+}
 void  SyntexAnalyzer::initAllTab() {
 	std::string exp_filename = "./exp_out.txt";
 	std::string matrix_filename = "./Matrix.txt";
@@ -64,6 +76,43 @@ void SyntexAnalyzer::showTab(std::vector< std::vector<int> >& A) {
 		}
 		std::cout << std::endl;
 	}
+}
+
+void SyntexAnalyzer::printAST()
+{
+	if (root) {
+		std::cout << std::endl << "抽象语法树先序遍历：" << std::endl;
+		printAST(root);
+	}
+	else {
+		std::cout << std::endl << "分析失败，无法生成抽象语法树" << std::endl;
+	}
+	
+}
+
+void SyntexAnalyzer::deleteTree()
+{
+	deleteTree(root);
+	root = nullptr;
+}
+
+void SyntexAnalyzer::printAST(TreeNode* root)
+{
+	if (root) {
+		std::cout << root->typeID;
+		if (root->is_leaf) {
+			std::cout << ":" << root->strVal;
+		}
+		std::cout << std::endl;
+		for (int i = 0; i < root->children.size();i++) {
+			printAST(root->children[i]);
+		}
+	}
+}
+
+TreeNode * SyntexAnalyzer::getAST()
+{
+	return root;
 }
 
 void SyntexAnalyzer::analyExpression() {
@@ -90,11 +139,12 @@ void SyntexAnalyzer::analyExpression() {
 	//临时变量声明 end
 
 	//初始化分析栈以及输入栈
-
-	analyStack.push_back(38);//0号非终极符入栈
+	root = new TreeNode(38);
+	analyStack.push_back(root);//0号非终极符入栈
 	//循环读取输入流   应该使用getNextToken()获取输入流  同上做修改 手动输入56575
 	Token t = lexA->getNextToken();
 	while (t.type != -1) {
+		tokenQueue.push(t);
 		std::cout << "字符值：" << t.strValue 
 			<< "  类型ID：" << t.type 
 			<< "  源代码行号：" << t.sourceLine << std::endl;
@@ -106,7 +156,7 @@ void SyntexAnalyzer::analyExpression() {
 
 	std::cout << "当前分析栈" << std::setw(15) << "||  当前输入栈" << std::endl;
 	for (i = 0; i < analyStack.size(); i++) {
-		std::cout << analyStack[i] << std::setw(3);
+		std::cout << analyStack[i]->typeID<< std::setw(3);
 	}
 	std::cout << "|||";
 	for (i = 0; i < exprStack.size(); i++) {
@@ -124,6 +174,7 @@ void SyntexAnalyzer::analyExpression() {
 			}
 			else {//情况2：若栈已空，输入流不空，则输入流报错
 				std::cout << "输入流出现错误" << std::endl;
+				deleteTree();
 			}
 			return;
 		}
@@ -131,9 +182,9 @@ void SyntexAnalyzer::analyExpression() {
 		//情况3：
 		//分析栈栈顶元素是非终极符 即为小于某常数VT VT为非终极符个数 此处为5
 		//用栈顶和输入流的当前单词去查当前矩阵，如果查得的值是产生式编号，则把对应的产生式右部逆序压入栈中；如果查得的值为错误 信息，则报错
-		if (analyStack.back() >= VT) {//当前栈顶是非终极符 查表
-			if (tableLL[analyStack.back() - VT][exprStack.front()] != -1) {//查表得到产生式编号  注意终极符编号减去VT
-				tabLLX = analyStack.back() - VT;
+		if (analyStack.back()->typeID >= VT) {//当前栈顶是非终极符 查表
+			if (tableLL[analyStack.back()->typeID - VT][exprStack.front()] != -1) {//查表得到产生式编号  注意终极符编号减去VT
+				tabLLX = analyStack.back()->typeID - VT;
 				tabLLY = exprStack.front();
 				proExp = tableLL[tabLLX][tabLLY];
 				std::cout << "X" << tabLLX << "Y" << tabLLY << std::endl;
@@ -145,43 +196,54 @@ void SyntexAnalyzer::analyExpression() {
 				}
 				std::cout << std::endl;
 				//将产生式右部逆序压入分析栈
+				TreeNode* temp = analyStack.back();
+				analyStack.pop_back();//弹栈
+				for (i = 0; i < tablePro[proExp].size(); i++) {
+					temp->children.push_back(new TreeNode(tablePro[proExp][i]));
+					if (temp->children.back()->typeID == -1) {
+						temp->children.back()->is_leaf = true;
+						temp->children.back()->strVal = "空";
+					}
+				}
 				if (tablePro[proExp][0] == -1) {
 					std::cout << "产生式推出空 打印分析栈弹栈" << std::endl;
-
-					analyStack.pop_back();
 				}
 				else {
-					std::cout << "产生式非空   正常处理" << std::endl;
-					analyStack.pop_back();//弹栈
-					for (i = tablePro[proExp].size() - 1; i >= 0; i--) {
-						analyStack.push_back(tablePro[proExp][i]);//逆序压入
+					std::cout << "产生式非空   正常处理" << std::endl;	
+					for (i = temp->children.size() - 1; i >= 0; i--) {
+						analyStack.push_back(temp->children[i]);//逆序压入
 					}
 				}
 			}
 			else {//错误信息处理
 				std::cout << "error  查表错误" << std::endl;
+				deleteTree();
 				exit(-1);
 			}
 		}
 		//情况4：
-		else if (analyStack.back() < VT) {//当前栈顶是当前栈顶是终极符 看其是否与输入流的头符相匹配，如果匹配 成功，去掉栈顶元素,并读下一个单词；若匹配不成功，则报错
-			if (analyStack.back() == exprStack.front()) {  //两者都是非终极符 看是否匹配
+		else if (analyStack.back()->typeID < VT) {//当前栈顶是当前栈顶是终极符 看其是否与输入流的头符相匹配，如果匹配 成功，去掉栈顶元素,并读下一个单词；若匹配不成功，则报错
+			if (analyStack.back()->typeID == exprStack.front()) {  //两者都是非终极符 看是否匹配
 				//成功 各自弹栈一个
+				analyStack.back()->strVal = tokenQueue.front().strValue;
+				analyStack.back()->is_leaf = true;
+				tokenQueue.pop();
 				analyStack.pop_back();
 				it = exprStack.begin();
 				exprStack.erase(it);
 			}
 			else {
 				std::cout << "error  单词匹配失败" << std::endl;
+				deleteTree();
 				exit(-1);
 			}
 		}
 		for (i = 0; i < analyStack.size(); i++) {
-			std::cout << analyStack[i] << std::setw(3);
+			std::cout << analyStack[i]->typeID<< std::setw(3);
 		}
 		std::cout << "|||";
 		for (i = 0; i < exprStack.size(); i++) {
-			std::cout << exprStack[i] << std::setw(3);
+			std::cout << exprStack[i]  << std::setw(3);
 		}
 		std::cout << std::endl;
 		std::cout << std::endl;

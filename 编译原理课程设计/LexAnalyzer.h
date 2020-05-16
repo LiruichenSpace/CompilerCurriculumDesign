@@ -36,7 +36,6 @@ private:
 	bool endStatusFlag[11];
 	char currChar;
 	std::unordered_map<std::string, int> cricicalMap;
-	std::unordered_set<char> validChars;
 	std::ifstream istream;
 	int currentLine;//µ±Ç°ÐÐºÅ
 };

@@ -98,7 +98,7 @@ Token LexAnalyzer::getNextToken() {
 	}
 	if (isEndStatus(currStatus)) {//如果当前状态为终止状态，则填入token值并正常返回
 		if (currStatus == 6) {
-			if (cricicalMap.find(str) != cricicalMap.end()){
+			if (cricicalMap.count(str) != 0){
 				token.type = cricicalMap[str];
 			}
 			else {
