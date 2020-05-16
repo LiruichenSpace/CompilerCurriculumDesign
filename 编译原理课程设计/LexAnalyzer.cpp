@@ -46,11 +46,11 @@ LexAnalyzer::LexAnalyzer()
 	cricicalMap[":="] = 35;
 	cricicalMap["/"] = 36;
 	cricicalMap["["] = 37;
+	currentLine = 1;
 }
 
 LexAnalyzer::LexAnalyzer(std::string sourceFile):LexAnalyzer()//机制原因，C++不能在构造函数中调用构造函数
-															//需要在初始化列表中调用
-{
+{															//需要在初始化列表中调用
 	initStream(sourceFile);
 }
 
@@ -72,6 +72,7 @@ Token LexAnalyzer::getNextToken() {
 	//处理输入文件可能为空或者滤去前导后为空
 	//DFA逻辑
 	Token token;
+	token.sourceLine = currentLine;
 	int currStatus = 0,nextStatus;
 	std::string str;
 	bool flag=true;
@@ -79,7 +80,8 @@ Token LexAnalyzer::getNextToken() {
 		if (!isValidChar()){
 			std::string errstr("检测到非法字符，词法分析失败,当前字符为:");
 			errstr.push_back(currChar);
-			Utils::error(errstr);
+			std::cout << std::endl << errstr + " 当前行数为：" << currentLine << std::endl;
+			exit(-1);
 		}
 		nextStatus = getDfaNextStatus(currStatus);//需要已经读入一个字符
 		if (nextStatus == -1) {//如果接下来没有转移去的状态，则结束。不继续向下读，保护currChar

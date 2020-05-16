@@ -95,7 +95,9 @@ void SyntexAnalyzer::analyExpression() {
 	//循环读取输入流   应该使用getNextToken()获取输入流  同上做修改 手动输入56575
 	Token t = lexA->getNextToken();
 	while (t.type != -1) {
-		std::cout << t.strValue << "  " << t.type << std::endl;
+		std::cout << "字符值：" << t.strValue 
+			<< "  类型ID：" << t.type 
+			<< "  源代码行号：" << t.sourceLine << std::endl;
 		exprStack.push_back(t.type);
 		t = lexA->getNextToken();
 	}
@@ -158,6 +160,7 @@ void SyntexAnalyzer::analyExpression() {
 			}
 			else {//错误信息处理
 				std::cout << "error  查表错误" << std::endl;
+				exit(-1);
 			}
 		}
 		//情况4：
@@ -167,14 +170,12 @@ void SyntexAnalyzer::analyExpression() {
 				analyStack.pop_back();
 				it = exprStack.begin();
 				exprStack.erase(it);
-
 			}
 			else {
 				std::cout << "error  单词匹配失败" << std::endl;
+				exit(-1);
 			}
 		}
-
-
 		for (i = 0; i < analyStack.size(); i++) {
 			std::cout << analyStack[i] << std::setw(3);
 		}
@@ -184,7 +185,6 @@ void SyntexAnalyzer::analyExpression() {
 		}
 		std::cout << std::endl;
 		std::cout << std::endl;
-
 		temp++;
 	}
 
